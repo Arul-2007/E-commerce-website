@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stationary Shop - Home</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f4f6f9; }
+    header {
+      background: #4CAF50; color: white; display: flex;
+      justify-content: space-between; align-items: center;
+      padding: 15px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    header h1 { margin: 0; font-size: 22px; }
+    .header-icons { display: flex; align-items: center; gap: 15px; }
+    .icon { cursor: pointer; font-size: 20px; }
+    .products {
+      padding: 30px 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .product {
+      background: white; padding: 15px; border-radius: 10px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      text-align: center; transition: transform 0.2s;
+    }
+    .product:hover { transform: translateY(-4px); }
+    .product img { width: 100%; height: 150px; object-fit: contain; margin-bottom: 10px; }
+    .product h3 { margin: 8px 0; font-size: 18px; color: #333; }
+    .product p { margin: 5px 0; font-size: 14px; color: #666; }
+    .product button {
+      margin-top: 10px; background: #4CAF50; border: none; color: white;
+      padding: 8px 14px; font-size: 14px; border-radius: 5px; cursor: pointer;
+    }
+    .product button:hover { background: #45a049; }
+  </style>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <h1>Stationary Shop</h1>
+    <div class="header-icons">
+      <i class="fas fa-user-circle icon" title="Profile"></i>
+      <i class="fas fa-cog icon" title="Settings"></i>
+      <i class="fas fa-shopping-cart icon" title="Cart"></i>
+    </div>
+  </header>
+
+  <!-- Products -->
+  <section class="products">
+    <div class="product" data-name="Notebook" data-price="50">
+      <img src="https://via.placeholder.com/200x150?text=Notebook" alt="Notebook">
+      <h3>Notebook</h3>
+      <p>₹50</p>
+      <button>Add to Cart</button>
+    </div>
+
+    <div class="product" data-name="Ball Pen" data-price="10">
+      <img src="https://via.placeholder.com/200x150?text=Pen" alt="Pen">
+      <h3>Ball Pen</h3>
+      <p>₹10</p>
+      <button>Add to Cart</button>
+    </div>
+
+    <div class="product" data-name="Pencil" data-price="5">
+      <img src="https://via.placeholder.com/200x150?text=Pencil" alt="Pencil">
+      <h3>Pencil</h3>
+      <p>₹5</p>
+      <button>Add to Cart</button>
+    </div>
+
+    <div class="product" data-name="Eraser" data-price="8">
+      <img src="https://via.placeholder.com/200x150?text=Eraser" alt="Eraser">
+      <h3>Eraser</h3>
+      <p>₹8</p>
+      <button>Add to Cart</button>
+    </div>
+
+    <div class="product" data-name="Color Box" data-price="120">
+      <img src="https://via.placeholder.com/200x150?text=Color+Box" alt="Color Box">
+      <h3>Color Box</h3>
+      <p>₹120</p>
+      <button>Add to Cart</button>
+    </div>
+  </section>
+
+  <!-- Firebase Add-to-Cart Script -->
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    let currentUser = null;
+
+    // Check logged-in user
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        console.log("Logged in as:", user.email);
+      } else {
+        // If not logged in, redirect back to login page
+        window.location.href = "login.html";
+      }
+    });
+
+    // Add event listeners to buttons
+    document.querySelectorAll(".product button").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        if (!currentUser) {
+          alert("Please log in first!");
+          return;
+        }
+
+        const productDiv = e.target.closest(".product");
+        const name = productDiv.dataset.name;
+        const price = parseInt(productDiv.dataset.price);
+
+        try {
+          await addDoc(
+            collection(db, "users", currentUser.uid, "cart"),
+            { name, price, addedAt: serverTimestamp() }
+          );
+          alert(`${name} added to cart!`);
+        } catch (err) {
+          console.error(err);
+          alert("Failed to add to cart.");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

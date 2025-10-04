@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stationary Shop</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url("generated-image.png") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .navbar {
+      background: #333;
+      padding: 10px 20px;
+      color: white;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      position: sticky;
+      top: 0;
+    }
+
+    .navbar i, .navbar .profile {
+      margin-left: 20px;
+      cursor: pointer;
+      font-size: 22px;
+    }
+
+    .profile {
+      background: #fff;
+      border-radius: 50%;
+      padding: 8px;
+    }
+
+    .cart-badge {
+      position: relative;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -12px;
+      background: red;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      font-size: 12px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 30px;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+    }
+
+    .add-icon {
+      font-size: 22px;
+      color: #ff6600;
+      cursor: pointer;
+      margin-top: 8px;
+      display: inline-block;
+      transition: 0.3s;
+    }
+    .add-icon:hover {
+      color: #cc5200;
+      transform: scale(1.2);
+    }
+
+    /* Cart container */
+    #cartItems {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      width: 300px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      display: none;
+      flex-direction: column;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 8px;
+    }
+
+    .cart-item img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+
+    .remove-btn {
+      background: red;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .notify {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: green;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      display: none;
+      animation: blink 0.8s ease-in-out 2;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    .profile {
+  background: #fff;
+  border-radius: 50%;
+  padding: 8px;
+  position: relative;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: #fff;
+  color: #333;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  display: none;
+  min-width: 200px;
+  z-index: 2000;
+  padding: 15px;
+}
+
+.profile-dropdown p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.logout-btn {
+  background: red;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <div class="navbar">
+    <i class="fas fa-cog"></i>
+    <div class="cart-badge" onclick="toggleCart()">
+      <i class="fas fa-shopping-cart"></i>
+      <span id="cartCount" class="cart-count">0</span>
+    </div>
+     <div class="profile" onclick="toggleProfile()">👤
+      <div class="profile-dropdown" id="profileDropdown">
+        <p id="userName">Username: Guest</p>
+        <p id="userEmail">Email: guest@example.com</p>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products -->
+  <div class="container">
+    <div class="card">
+      <img src="Ballpointpen-img.png" alt="Pen">
+      <h3>Ball pointer Pen</h3>
+      <p>₹10</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Blue Pen', 'Ballpointpen-img.png',10)"></i>
+    </div>
+    <div class="card">
+      <img src="Notebook-img.png" alt="Notebook">
+      <h3>Notebook</h3>
+      <p>₹50</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Notebook', 'Notebook-img.png',50)"></i>
+    </div>
+    <div class="card">
+      <img src="Marker-img.png" alt="Marker">
+      <h3>Marker</h3>
+      <p>₹20</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Marker', 'Marker-img.png',20)"></i>
+    </div>
+    <div class="card">
+      <img src="Eraser-img.png" alt="Eraser">
+      <h3>Eraser</h3>
+      <p>₹5</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Eraser', 'Eraser-img.png',5)"></i>
+    </div>
+    <div class="card">
+      <img src="Pencil-img.png" alt="Pencil">
+      <h3>Pencil</h3>
+      <p>₹5</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Pencil', 'Pencil-img.png',5)"></i>
+    </div>
+    <div class="card">
+      <img src="Ruler-img.png" alt="Ruler">
+      <h3>Ruler</h3>
+      <p>₹15</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Ruler', 'Ruler-img.png',15)"></i>
+    </div>
+    <div class="card">
+      <img src="Sharpener-img.png" alt="Sharpener">
+      <h3>Sharpener</h3>
+      <p>₹5</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Sharpener', 'Sharpener-img.png',5)"></i>
+    </div>
+    <div class="card">
+      <img src="Crayons-img.png" alt="Crayons">
+      <h3>Crayons</h3>
+      <p>₹30</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Crayons', 'Crayons-img.png',30)"></i>
+    </div>
+    <div class="card">
+      <img src="Scissors-img.png" alt="Scissors">
+      <h3>Scissors</h3>
+      <p>₹50</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Scissors', 'Scissors-img.png',50)"></i>
+    </div>
+    <div class="card">
+      <img src="Notepad-img.png" alt="Notepad">
+      <h3>Notepad</h3>
+      <p>₹45</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Notepad', 'Notepad-img.png',45)"></i>
+    </div>
+    <div class="card">
+      <img src="Pappers-img.png" alt="Pappers">
+      <h3>Pappers</h3>
+      <p>₹50</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Pappers', 'Pappers-img.png',50)"></i>
+    </div>
+    <div class="card">
+      <img src="Compass-img.png" alt="Compass">
+      <h3>Compass</h3>
+      <p>₹50</p>
+      <i class="fas fa-cart-plus add-icon" onclick="addToCart('Compass', 'Compass-img.png',50)"></i>
+    </div>
+  </div>
+
+  <!-- Cart -->
+<div id="cartItems">
+<button id="buyBtn" style="display:none; margin:10px auto; padding:8px 12px; background:#28a745; color:white; border:none; border-radius:5px; cursor:pointer;">
+  Buy Now
+</button>
+</div>
+<!-- Notification -->
+<div id="notify" class="notify">Added to cart!</div>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
+  import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+
+  let cart = [];
+
+  window.addToCart= function(name, img,price){
+    const existing = cart.find(item => item.name === name);
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ name, img,price, qty: 1 });
+    }
+    updateCartCount();
+    renderCart();
+    showNotify();
+  }
+
+  function renderCart() {
+    const cartBox = document.getElementById("cartItems");
+    const buyBtn = document.getElementById("buyBtn");
+    cartBox.innerHTML = "";
+
+    if (cart.length === 0) {
+      cartBox.innerHTML = "<p>Your cart is empty</p>";
+      buyBtn.style.display = "none";
+      return;
+    }
+
+    cart.forEach((item, index) => {
+      cartBox.innerHTML += `
+        <div class="cart-item">
+          <img src="${item.img}" alt="${item.name}">
+          <span>${item.name} x${item.qty}</span>
+          <button class="remove-btn" onclick="removeFromCart(${index})">Remove</button>
+        </div>`;
+    });
+
+    cartBox.appendChild(buyBtn);
+    buyBtn.style.display = "block";
+  }
+
+  window.removeFromCart = function (index) {
+    cart.splice(index, 1);
+    updateCartCount();
+    renderCart();
+  }
+
+  function updateCartCount() {
+    const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+    document.getElementById("cartCount").innerText = totalQty;
+  }
+
+  window.toggleCart = function () {
+    const cartBox = document.getElementById("cartItems");
+    const buyBtn = document.getElementById("buyBtn");
+    const visible = cartBox.style.display === "flex";
+    cartBox.style.display = visible ? "none" : "flex";
+    buyBtn.style.display = visible ? "none" : (cart.length > 0 ? "block" : "none");
+  }
+
+  function showNotify() {
+    const notify = document.getElementById("notify");
+    notify.style.display = "block";
+    setTimeout(() => notify.style.display = "none", 1200);
+  }
+
+ // ✅ Buy button click → save cart & go to payment page
+document.getElementById("buyBtn").addEventListener("click", () => {
+  localStorage.setItem("cart", JSON.stringify(cart));  // Save cart
+  window.location.href = "payment.html";              // Redirect to payment page
+});
+
+
+  // ✅ Profile dropdown toggle
+  window.toggleProfile = function () {
+    const dropdown = document.getElementById("profileDropdown");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+  }
+
+  // ✅ Auth state change → load profile info
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      document.getElementById("userEmail").innerText = "Email: " + user.email;
+
+      // If you stored username in Firestore (users/{uid})
+      const userDocRef = doc(db, "users", user.uid);
+      const snap = await getDoc(userDocRef);
+      if (snap.exists()) {
+        document.getElementById("userName").innerText = "Username: " + snap.data().username;
+      } else {
+        document.getElementById("userName").innerText = "Username: " + (user.displayName || "No Name");
+      }
+    } else {
+      // Not logged in → redirect to login
+      window.location.href = "login.html";
+    }
+  });
+
+  // ✅ Logout
+  window.logout = function () {
+    signOut(auth).then(() => {
+      window.location.href = "login.html";
+    });
+  }
+</script>
+
+
+</body>
+</html>
