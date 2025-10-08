@@ -19,12 +19,46 @@
     h1 {
       color: green;
     }
+    .home-btn {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .home-btn:hover {
+      background-color: #0056b3;
+    }
+    .timer {
+      margin-top: 10px;
+      color: #555;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
   <div class="message">
     <h1>Thank You for Shopping!</h1>
     <p>We appreciate your purchase at our Stationary Shop.</p>
+    <p class="timer">Redirecting to homepage in <span id="countdown">5</span> seconds...</p>
+    <a href="homepage.html" class="home-btn">Back to Home</a>
   </div>
+
+  <script>
+    let seconds = 5;
+    const countdown = document.getElementById("countdown");
+
+    const timer = setInterval(() => {
+      seconds--;
+      countdown.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(timer);
+        window.location.href = "homepage.html";
+      }
+    }, 1000);
+  </script>
 </body>
 </html>
